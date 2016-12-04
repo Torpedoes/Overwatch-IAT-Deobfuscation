@@ -4,7 +4,7 @@
 
 //plugin data
 #define PLUGIN_NAME "OW Imports"
-#define PLUGIN_VERSION 2
+#define PLUGIN_VERSION 3
 
 //functions
 bool pluginInit(PLUG_INITSTRUCT* initStruct);

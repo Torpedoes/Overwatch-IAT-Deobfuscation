@@ -10,8 +10,8 @@
 // global vars
 //
 
-/* currently not used */
-// set in CBCREATEPROCESS.
+// 12.4.2016  calling DbgValFromString for $hProcess seems to be bugged in some 
+// versions of xdbg.  set this in CBCREATEPROCESS.  
 static HANDLE hProcess = nullptr;
 
 /* currently not used */
@@ -51,6 +51,7 @@ bool pluginStop();
 void pluginSetup();
 
 // plugin exports
+PLUG_EXPORT void CBCREATEPROCESS(CBTYPE cbType, PLUG_CB_CREATEPROCESS* info);
 PLUG_EXPORT void CBSTOPDEBUG(CBTYPE cbType, PLUG_CB_STOPDEBUG* info);
 PLUG_EXPORT void CBMENUENTRY(CBTYPE cbType, PLUG_CB_MENUENTRY* info);
 
@@ -114,6 +115,11 @@ void pluginSetup()
 //
 // plugin exports
 //
+
+PLUG_EXPORT void CBCREATEPROCESS(CBTYPE cbType, PLUG_CB_CREATEPROCESS* info)
+{
+    hProcess = info->fdProcessInfo->hProcess;
+}
 
 PLUG_EXPORT void CBSTOPDEBUG(CBTYPE cbType, PLUG_CB_STOPDEBUG* info)
 {
@@ -278,10 +284,9 @@ bool DeobfuscateImportBlock(duint blockBase, duint& importAddress, duint& nextIm
 
 void UnpackOverwatchImports(duint regionBase)
 {
-    const HANDLE hProcess = (HANDLE)DbgValFromString("$hProcess");
     if (!hProcess)
     {
-        plog("[" PLUGIN_NAME "]:  $hProcess returned 0, exiting.\n", hProcess);
+        plog("[" PLUGIN_NAME "]:  invalid hProcess, exiting.\n", hProcess);
         return;
     }
 
